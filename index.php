@@ -1,3 +1,23 @@
+<?php 
+ session_start();
+ $session = false;
+ if(!isset($_SESSION['user_id'])){
+    $session = false;
+ } else {
+    $session = true;
+    include("connection.php");
+    if (isset($_GET['id'])) {
+        $txtid = (isset($_GET["id"]) ? $_GET["id"] : "");
+        $stm = $connection->prepare("SELECT * FROM users WHERE id=:txtid");
+        $stm->bindParam(":txtid", $txtid);
+        $stm->execute();
+        $register = $stm->fetch(PDO::FETCH_LAZY);
+
+        $name = $register['name'];
+        $lastname = $register['lastname'];
+    }
+ }
+?>
 <!DOCTYPE html>
 <html class="no-js" lang="en">
   <head>
@@ -33,14 +53,7 @@
   </head>
 
   <body>
-    <!--[if lt IE 8]>
-      <p class="browserupgrade">
-        You are using an <strong>outdated</strong> browser. Please
-        <a href="http://browsehappy.com/">upgrade your browser</a> to improve
-        your experience.
-      </p>
-    <![endif]-->
-    <!-- preloader area start -->
+    <p><?php echo $session; ?></p>
     <div id="preloader">
       <div class="loader"></div>
     </div>
@@ -81,24 +94,6 @@
                 <li>
                   <a href="#"><i class="ti-gallery"></i><span>Galeria</span></a>
                 </li>
-
-                <!-- <li>
-                                <a href="javascript:void(0)" aria-expanded="true"><i class="fa fa-align-left"></i>
-                                    <span>Multi
-                                        level menu</span></a>
-                                <ul class="collapse">
-                                    <li><a href="#">Item level (1)</a></li>
-                                    <li><a href="#">Item level (1)</a></li>
-                                    <li><a href="#" aria-expanded="true">Item level (1)</a>
-                                        <ul class="collapse">
-                                            <li><a href="#">Item level (2)</a></li>
-                                            <li><a href="#">Item level (2)</a></li>
-                                            <li><a href="#">Item level (2)</a></li>
-                                        </ul>
-                                    </li>
-                                    <li><a href="#">Item level (1)</a></li>
-                                </ul>
-                            </li> -->
               </ul>
             </nav>
           </div>
@@ -228,12 +223,12 @@
                   alt="avatar"
                 />
                 <h4 class="user-name dropdown-toggle" data-toggle="dropdown">
-                  Juan Pablo Rivera <i class="fa fa-angle-down"></i>
+                <?php echo $name; ?> <?php echo $lastname; ?> <i class="fa fa-angle-down"></i>
                 </h4>
                 <div class="dropdown-menu">
                   <a class="dropdown-item" href="#">Mensajes</a>
                   <a class="dropdown-item" href="#">Ajustes</a>
-                  <a class="dropdown-item" href="#">Cerrar Sesión</a>
+                  <a class="dropdown-item" href="logout.php">Cerrar Sesión</a>
                 </div>
               </div>
             </div>
@@ -1019,6 +1014,7 @@
 
       google.maps.event.addDomListener(window, "load", initialize);
     </script>
+    <script src="https://cdn.auth0.com/js/auth0-spa-js/2.0/auth0-spa-js.production.js"></script>
     <!-- jquery latest version -->
     <script src="assets/js/vendor/jquery-2.2.4.min.js"></script>
     <!-- bootstrap 4 js -->
